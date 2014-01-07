@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/eac/simple_access.png)](https://travis-ci.org/eac/simple_access)
+
 simple_access
 =============
 
