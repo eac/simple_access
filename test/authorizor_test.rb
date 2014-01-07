@@ -65,27 +65,37 @@ describe SimpleAccess::Authorizor do
 
   describe "can?" do
 
-    it "queries the mapped authorization model" do
-      assert_equal true,  @authorizor.can?(:edit, User.new)
-      assert_equal false, @authorizor.can?(:edit, Ticket.new)
+    describe "when checking an instance" do
 
-      assert_equal true,  @authorizor.can?(:delete, User)
-      assert_equal false, @authorizor.can?(:delete, Ticket)
+      it "queries the authorization model mapped to the instance's class" do
+        assert_equal true,  @authorizor.can?(:edit, User.new)
+        assert_equal false, @authorizor.can?(:edit, Ticket.new)
+      end
+
+      it "provides the instance to the permission check method" do
+        user = User.new
+        assert_equal true,  @authorizor.can?(:edit, user)
+
+        user = User.new
+        user.editable = false
+
+        assert_equal false, @authorizor.can?(:edit, user)
+      end
+
     end
 
-    it "provides the parameter to the check when it's an instance" do
-      user = User.new
-      assert_equal true,  @authorizor.can?(:edit, user)
+    describe "when checking a class" do
 
-      user = User.new
-      user.editable = false
+      it "queries the mapped authorization model" do
+        assert_equal true,  @authorizor.can?(:delete, User)
+        assert_equal false, @authorizor.can?(:delete, Ticket)
+      end
 
-      assert_equal false, @authorizor.can?(:edit, user)
-    end
+      it "does not provide the class to the permission check method" do
+        # This would just blow up otherwise
+        assert_equal true, @authorizor.can?(:delete, User)
+      end
 
-    it "only provides the parameter when the check accepts it" do
-      # This would just blow up otherwise
-      assert_equal true, @authorizor.can?(:delete, User.new)
     end
 
     it "raises an AuthorizorNotFound error when no corresponding authorization model is defined" do
